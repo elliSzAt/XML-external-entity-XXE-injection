@@ -127,3 +127,18 @@ Trong ví dụ trên có 2 loại thông tin:
   - Thông tin đánh dấu, như <name> và <company>.  
   - Text, hoặc dữ liệu là ký tự, như Tanmey.  
   
+Sơ đồ sau minh họa qui tắc cú pháp để viết các kiểu đánh dấu và text khác nhau trong một tài liệu XML.  
+    
+![image](https://github.com/elliSzAt/XML-external-entity-XXE-injection/assets/125866921/e29c1eaf-4006-4fc0-8d58-339c470464e1)
+
+**Khai báo XML (XML Declaration)**
+    
+Tài liệu XML có thể tùy ý có một phần khai báo XML. Nó được viết như sau:  
+
+<?xml version="1.0" encoding="UTF-8"?>  
+
+Ở đây, version là phiên bản XML và encoding xác định mã hóa ký tự được sử dụng trong tài liệu.  
+    
+**Các qui tắc cú pháp để khai báo XML**  
+    
+Khai báo XML (XML declaration) là phân biệt kiểu chữ và phải bắt đầu với “<?xml>” ở đây “xml” viết ở dạng chữ thường.
