@@ -206,11 +206,11 @@ Một thuộc tính xác định thuộc tính cho phần tử, sử dụng mộ
   - Tên thuộc tính trong XML là phân biệt kiểu chữ (không giống như HTML). Tức là, HREF và href là hai thuộc tính khác nhau trong XML.  
   - Cùng một thuộc tính không thể có hai giá trị trong một cú pháp. Ví dụ sau là sai cú pháp bởi vì thuộc tính b được xác định hai lần:  
           
-      <a b="x" c="y" b="z">....</a>
+        <a b="x" c="y" b="z">....</a>
           
   - Tên thuộc tính được định nghĩa không có sự trích dẫn, trong khi giá trị thuộc tính phải luôn luôn trong các dấu trích dẫn. Ví dụ sau là sai cú pháp:  
          
-      <a b=x>....</a>
+        <a b=x>....</a>
           
   - Trong ví dụ này, giá trị thuộc tính không được định nghĩa trong các dấu trích dẫn.
           
@@ -224,3 +224,209 @@ Một thuộc tính xác định thuộc tính cho phần tử, sử dụng mộ
 ![image](https://github.com/elliSzAt/XML-external-entity-XXE-injection/assets/125866921/b0475c13-fbda-475c-b60b-83bd4f82ec09)
 
 # XML DTD
+
+**DTD là gì**
+            
+-    1 DTD là 1 Document Type Definition.
+-    1 DTD định nghĩa cấu trúc và các yếu tố và thuộc tính hợp pháp của 1 tài liệu XML.
+            
+**Tại sao phải sử dụng DTD**
+            
+Với 1 DTD, các nhóm người độc lập có thể đồng ý về một DTD tiêu chuẩn để trao đổi dữ liệu. 1 ứng dụng có thể sử dụng 1 DTD để xác thực dữ liệu XML có hợp lệ hay không.
+            
+**Khai báo 1 Internal DTD**
+            
+Nếu DTD được khai báo bên trong file XML, nó phải được gói bên trong <!DOCTYPE>
+            
+**XML document with an internal DTD**
+            
+```
+<?xml version="1.0"?>
+<!DOCTYPE note [
+  <!ELEMENT note    (to,from,heading,body)>
+  <!ELEMENT to      (#PCDATA)>
+  <!ELEMENT from    (#PCDATA)>
+  <!ELEMENT heading (#PCDATA)>
+  <!ELEMENT body    (#PCDATA)>
+]>
+<note>
+<to>Tove</to>
+<from>Jani</from>
+<heading>Reminder</heading>
+<body>Don't forget me this weekend!</body>
+</note> 
+```
+DTD phía trên có thể được hiểu như sau:
+            
+-    !DOCTYPE xác định rằng phần tử root của tài liệu này là note.
+-    !ELEMENT note xác định rằng phần tử note phải chứa bốn phần tử: “to, from, header, body”.
+-    !ELEMENT to/from/heading/body xác định phần tử to/from/heading/body thuộc loại “#PCDATA”.
+            
+**Khai báo 1 External DTD**
+            
+Nếu DTD được khai báo trong 1 file ngoài, <!DOCTYPE> phải bao gồm reference đến DTD file.
+            
+Tài liệu XML với reference đến 1 External DTD:
+            
+```
+<?xml version="1.0"?>
+<!DOCTYPE note SYSTEM "note.dtd">
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+```
+            
+Và đây là file note.dtd
+            
+```<!ELEMENT note (to,from,heading,body)>
+<!ELEMENT to (#PCDATA)>
+<!ELEMENT from (#PCDATA)>
+<!ELEMENT heading (#PCDATA)>
+<!ELEMENT body (#PCDATA)>
+```
+            
+**DTD – XML Building Blocks**
+            
+Các khối xây dựng của các tài liệu XML và HTML là element(Phần tử)
+            
+**The Building Blocks of XML Documents**
+            
+Nhìn từ quan điểm DTD, tất cả các tài liệu XML được tạo thành bởi các building block sau:
+            
+**Elements(Phần tử)**
+            
+Ví dụ ở HTML thì phần tử là “body” và “table”, trong XML thì phần tử có thể là “note” hoặc “message”. Các phần tử có thể chứa text, các phàn tử khác, hoặc rỗng. Ví dụ của phần tử HTML rỗng là “hr”, “br” và “img”
+Ví dụ:
+            
+```
+<body>some text</body>
+ 
+<message>some text</message>
+```
+            
+**Attributes(Thuộc tính)**
+            
+Thuộc tính cung cấp thông tin thêm về phần tử
+Thược tính luôn được đặt bên trong tag mở đầu của phần tử. Thuộc tính luôn ở dạng cặp name/value. Ví dụ:
+            
+ ```
+<img src=”computer.gif” />
+```
+            
+**Entities(Thực thể)**
+            
+1 vài kí tự có ý nghĩa đặc biệt trong XML, ví dụ ``<`` định nghĩa sự mở đầu của 1 thẻ XML. Các thực thể sau được định nghĩa trước trong XML.
+                                                     
+![](https://hackmd.io/_uploads/B1pVT8QBh.png)
+
+Thực thể được sử dụng để định nghĩa shortcut đến 1 số kí tự đặc biệt. Thực thể có thể được khai báo bên trong hoặc bên ngoài.
+                                                       
+**Khai báo thực thể bên trong:**
+                                                       
+Cú pháp <!ENTITY entity-name “entity-value”>
+
+Ví dụ: 
+
+```DTD Example:
+<!ENTITY writer "Donald Duck.">
+<!ENTITY copyright "Copyright W3Schools.">
+ 
+XML example:
+<author>&writer;&copyright;</author>
+```
+
+Note: 1 thực thể có 3 phần, “&”, name và “;”
+
+**Khai báo thực thể bên ngoài**
+
+Cú pháp: <!ENTiTY entity-name SYSTEM “URL/URI”>
+
+Ví dụ:
+
+```
+DTD Example:
+ 
+<!ENTITY writer SYSTEM "https://www.w3schools.com/entities.dtd">
+<!ENTITY copyright SYSTEM "https://www.w3schools.com/entities.dtd">
+ 
+XML example:
+ 
+<author>&writer;&copyright;</author>
+```
+
+XML cho phép custom entities được định nghĩa bên trong DTD. Ví dụ:
+
+<!DOCTYPE foo [ <!ENTITY myentity "my entity value" > ]>
+
+Định nghĩa này có nghĩa là mọi cách sử dụng tham chiếu thực thể &myentity; trong tài liệu XML sẽ được thay thế bằng giá trị đã xác định: “my entity value”..
+
+# XML external entities là gì?
+
+Các thực thể bên ngoài XML là một loại thực thể tùy chỉnh có định nghĩa nằm bên ngoài DTD nơi chúng được khai báo.
+Khai báo của một thực thể bên ngoài sử dụng từ khóa SYSTEM và phải chỉ định một URL mà từ đó giá trị của thực thể sẽ được tải. Ví dụ:
+<!DOCTYPE foo [ <!ENTITY ext SYSTEM "http://normal-website.com" > ]>
+
+URL có thể sử dụng giao thức file:// và do đó các thực thể bên ngoài có thể được tải từ tệp. Ví dụ:
+<!DOCTYPE foo [ <!ENTITY ext SYSTEM "file:///path/to/file" > ]>
+
+Các thực thể bên ngoài XML cung cấp phương tiện chính để phát sinh các cuộc tấn công XXE
+
+# Làm thế nào các lổ hổng XXE có thể phát sinh?
+
+1 số ứng dụng sử dụng XML format để truyền data giữa trình duyệt và server. Các ứng dụng thực hiện điều này hầu như luôn sử dụng thư viện chuẩn hoặc API nền tảng để xử lý dữ liệu XML trên server. Lổ hổng XXR phát sinh bởi vì XML XML chứa nhiều tính năng nguy hiểm tiềm ẩn khác nhau và trình phân tích cú pháp tiêu chuẩn hỗ trợ các tính năng này ngay cả khi chúng không được ứng dụng sử dụng bình thường.
+
+XXE là một loại thực thể XML tùy chỉnh có các giá trị đã xác định được tải từ bên ngoài DTD mà chúng được khai báo. Các thực thể bên ngoài đặc biệt thú vị từ góc độ bảo mật vì chúng cho phép một thực thể được xác định dựa trên nội dung của đường dẫn tệp hoặc URL.
+
+# Các loại hình tấn công XXE
+
+Có nhiều loại hình tấn công XXE:
+
+-    Khai thác XXE để đọc file: Khi 1 external entity được định nghĩa bao gồm nội dung của 1 file và trả về trong response.
+-    Khai thác XXE để thực hiện SSRF: khi 1 external entity được định nghĩa dựa trên 1 URL đến hệ thống backend.
+-    Khai thác blind XXE đọc data out-of-band, khi dữ liệu nhạy crm được truyền từ server đến hệ thống mà hacker điều khiển.
+-    Blind XXE đọc data thông qua thông báo error, hacker có thể trigger 1 thông báo error có chứa dữ liệu nhạy cảm.
+
+# Khai thác XXE để đọc file
+
+Để thực hiện một cuộc tấn công chèn XXE truy xuất một tệp tùy ý từ hệ thống tệp của máy chủ, bạn cần sửa đổi XML đã gửi theo hai cách:
+
+-    Giới thiệu (hoặc chỉnh sửa) phần tử DOCTYPE xác định một thực thể bên ngoài chứa đường dẫn đến tệp.
+-    Chỉnh sửa giá trị dữ liệu trong XML được trả về trong phản hồi của ứng dụng, để sử dụng thực thể bên ngoài đã xác định.
+
+Ví dụ: 1 ứng dụng shopping check giá của sản phẩm bằng cách submit 1 XML đến server.
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<stockCheck><productId>381</productId></stockCheck>
+```
+
+Ứng dụng này không thực hiện bất kì biện pháp phòng chống XXE nào, vì vậy ta có thể exploit XXE để đọc file /etc/passwd bằng cách dùng payload:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
+<stockCheck><productId>&xxe;</productId></stockCheck>
+```
+
+Payload XXE này sẽ định nghĩa 1 thực thể &xxe; có giá trị là nội dung của file /etc/passwd và sử dung thực thể trong giá trị của productId. Response:
+
+```
+Invalid product ID: root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+```
+
+# Exploiting XXE to perform SSRF attacks
+
+Ngoài việc truy xuất dữ liệu nhạy cảm, tác động chính khác của các cuộc tấn công XXE là chúng có thể được sử dụng để thực hiện giả mạo yêu cầu phía máy chủ (SSRF). Đây là một lỗ hổng nghiêm trọng tiềm ẩn trong đó ứng dụng phía máy chủ có thể được tạo ra để thực hiện các yêu cầu HTTP tới bất kỳ URL nào mà máy chủ có thể truy cập.
+
+Để khai thác lỗ hổng XXE để thực hiện tấn công SSRF, bạn cần xác định một thực thể XML bên ngoài bằng cách sử dụng URL mà bạn muốn nhắm mục tiêu và sử dụng thực thể đã xác định trong một giá trị dữ liệu. Nếu bạn có thể sử dụng thực thể đã xác định trong một giá trị dữ liệu được trả về trong phản hồi của ứng dụng, thì bạn sẽ có thể xem phản hồi từ URL trong phản hồi của ứng dụng và do đó có được tương tác hai chiều với hệ thống back-end. Nếu không, bạn sẽ chỉ có thể thực hiện các cuộc tấn công SSRF mù (vẫn có thể gây ra hậu quả nghiêm trọng).
+
+Ví dụ:
+```
+ <!DOCTYPE foo [ <!ENTITY xxe SYSTEM “http://internal.vulnerable-website.com/”&gt; ]>
+```
+
